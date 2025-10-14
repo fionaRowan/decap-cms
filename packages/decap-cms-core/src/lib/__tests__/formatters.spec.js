@@ -275,7 +275,7 @@ describe('formatters', () => {
 
   describe('slugFormatter', () => {
     const date = new Date('2020-01-01');
-    jest.spyOn(global, 'Date').mockImplementation(() => date);
+    Date.now = jest.spyOn(Date, 'now').mockImplementation(() => date);
 
     const { selectIdentifier } = require('../../reducers/collections');
 
@@ -310,6 +310,32 @@ describe('formatters', () => {
           slugConfig,
         ),
       ).toBe('entry-slug');
+    });
+
+    it('should see date filters applied to fields.date', () => {
+      selectIdentifier.mockReturnValueOnce('title');
+      const entryDate = new Date('2025-10-20');
+
+      expect(
+        slugFormatter(
+          Map({ slug: "{{fields.date | date('YYYY-MM')}}-{{slug}}" }),
+          Map({ date: entryDate, title: 'post title' }),
+          slugConfig,
+        ),
+      ).toBe('2025-10-post-title');
+    });
+
+    it('should see date filters applied to date, pulled fron entry as any unknown key', () => {
+      selectIdentifier.mockReturnValueOnce('title');
+      const entryDate = new Date('2025-10-20');
+
+      expect(
+        slugFormatter(
+          Map({ slug: "{{date | date('YYYY-MM')}}-{{slug}}" }),
+          Map({ date: entryDate, title: 'post title' }),
+          slugConfig,
+        ),
+      ).toBe('2025-10-post-title');
     });
 
     it('should return slug', () => {

@@ -129,7 +129,7 @@ export function slugFormatter(
   }
 
   const processSegment = getProcessSegment(slugConfig);
-  const date = new Date();
+  const date = new Date(Date.now());
   const slug = compileStringTemplate(slugTemplate, date, identifier, entryData, processSegment);
 
   if (!collection.has('path')) {

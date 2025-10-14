@@ -139,8 +139,15 @@ function getExplicitFieldReplacement(key: string, data: Map<string, unknown>) {
   }
   const fieldName = key.slice(FIELD_PREFIX.length);
   const value = data.getIn(keyToPathArray(fieldName));
+
   if (typeof value === 'object' && value !== null) {
-    return JSON.stringify(value);
+    const strValue = JSON.stringify(value);
+    
+    if(key === 'date') {
+      return new Date(strValue);
+    }
+
+    return strValue;
   }
   return value;
 }
@@ -192,13 +199,13 @@ export function compileStringTemplate(
         replacement = data.getIn(keyToPathArray(key), '') as string;
       }
 
+      const filterFunction = getFilterFunction(filter);
+      if (filterFunction) {
+        replacement = filterFunction(replacement);
+      }
+      
       if (processor) {
         return processor(replacement);
-      } else {
-        const filterFunction = getFilterFunction(filter);
-        if (filterFunction) {
-          replacement = filterFunction(replacement);
-        }
       }
 
       return replacement;
