@@ -61,7 +61,18 @@ export function parseDateFromEntry(entry: Map<string, unknown>, dateFieldName?: 
     return;
   }
 
-  const dateValue = entry.getIn(['data', dateFieldName]);
+  const entryData = entry.getIn(['data']);
+  return parseDateFromEntryData(entryData, dateFieldName);
+}
+
+export function parseDateFromEntryData(
+  entryData: Map<string, unknown>,
+  dateFieldName?: string | null,
+) {
+  if (!dateFieldName) {
+    return;
+  }
+  const dateValue = entryData.getIn([dateFieldName]);
   const dateDayjs = dateValue && dayjs(dateValue);
   if (dateDayjs && dateDayjs.isValid()) {
     return dateDayjs.toDate();
@@ -191,7 +202,6 @@ export function compileStringTemplate(
       } else {
         replacement = data.getIn(keyToPathArray(key), '') as string;
       }
-
       if (processor) {
         return processor(replacement);
       } else {
